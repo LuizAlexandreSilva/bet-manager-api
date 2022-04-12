@@ -1,0 +1,18 @@
+version: "3"
+services:
+  postgres:
+    container_name: bet-manager-postgres
+    image: postgres:14.2-alpine
+    platform: linux/amd64
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
+    driver: local

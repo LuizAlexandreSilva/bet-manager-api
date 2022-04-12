@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id String  @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  Bankrolls Bankrolls[]
+  Competitions Competitions[]
+  Markets Markets[]
+}
+
+model Competitions {
+  id String  @id @default(uuid())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId String?
+  Users Users? @relation(fields: [userId], references: [id])
+  
+  Transaction Transactions[]
+}
+
+model Markets {
+  id String  @id @default(uuid())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String?
+  Users Users? @relation(fields: [userId], references: [id])
+  Transaction Transactions[]
+}
+
+model Bankrolls {
+  id String  @id @default(uuid())
+  name String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted Boolean @default(false)
+  userId String
+  Users Users @relation(fields: [userId], references: [id])
+  Transactions Transactions[]
+}
+
+enum TransactionType {
+  STANDARD_BET
+  MULTIPLE_BET
+  DEPOSIT
+  WITHDRAW
+}
+
+enum TransactionStatus {
+  PENDING
+  WON
+  LOSS
+}
+
+model Transactions {
+  id String  @id @default(uuid())
+  type TransactionType
+  eventName String
+  date DateTime
+  stake Decimal
+  odd Float
+  status TransactionStatus
+  note String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bankrollId String
+  Bankroll Bankrolls @relation(fields: [bankrollId], references: [id])
+  competitionId String
+  Competition Competitions @relation(fields: [competitionId], references: [id])
+  marketId String
+  Market Markets @relation(fields: [marketId], references: [id])
+  MultipleSelections MultipleSelections[]
+}
+
+model MultipleSelections {
+  id String  @id @default(uuid())
+  name String
+  odd Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactionId String
+  Transaction Transactions @relation(fields: [transactionId], references: [id])
+}
