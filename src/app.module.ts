@@ -6,9 +6,10 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { UsersModule } from './users/users.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, ConfigModule.forRoot({ isGlobal: true })],
+  imports: [AuthModule, UsersModule, ConfigModule.forRoot({ isGlobal: true }), TransactionsModule],
   controllers: [AppController],
   providers: [
     AppService,

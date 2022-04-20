@@ -14,7 +14,15 @@ async function main() {
     },
   });
 
-  console.log(user);
+  const userId = user.id;
+  const bankroll = await prisma.bankrolls.create({
+    data: {
+      name: 'Banca do alezinho',
+      userId,
+    },
+  });
+
+  console.log(user, bankroll);
 }
 
 main()

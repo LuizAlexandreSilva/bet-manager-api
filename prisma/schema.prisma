@@ -21,7 +21,7 @@ model Users {
   password String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   Bankrolls Bankrolls[]
   Competitions Competitions[]
   Markets Markets[]
@@ -32,10 +32,10 @@ model Competitions {
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   userId String?
   Users Users? @relation(fields: [userId], references: [id])
-  
+
   Transaction Transactions[]
 }
 
@@ -61,6 +61,14 @@ model Bankrolls {
   Transactions Transactions[]
 }
 
+model Sports {
+  id String  @id @default(uuid())
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Transactions Transactions[]
+}
+
 enum TransactionType {
   STANDARD_BET
   MULTIPLE_BET
@@ -82,16 +90,18 @@ model Transactions {
   stake Decimal
   odd Float
   status TransactionStatus
-  note String
+  note String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   bankrollId String
   Bankroll Bankrolls @relation(fields: [bankrollId], references: [id])
-  competitionId String
-  Competition Competitions @relation(fields: [competitionId], references: [id])
-  marketId String
-  Market Markets @relation(fields: [marketId], references: [id])
+  competitionId String?
+  Competition Competitions? @relation(fields: [competitionId], references: [id])
+  marketId String?
+  Market Markets? @relation(fields: [marketId], references: [id])
   MultipleSelections MultipleSelections[]
+  sportId String
+  Sport Sports @relation(fields: [sportId], references: [id])
 }
 
 model MultipleSelections {
