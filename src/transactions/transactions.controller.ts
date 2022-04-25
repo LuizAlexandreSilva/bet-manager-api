@@ -11,8 +11,14 @@ export class TransactionsController {
   }
 
   @Get('bets')
-  async listBets(@Request() req) {
-    const { bankrollId } = req.params;
-    return this.service.listBets(bankrollId);
+  async listBetsByPeriod(@Request() req) {
+    const { startDate, endDate } = req.query;
+    return this.service.listBetsByPeriod(startDate, endDate);
+  }
+
+  @Get('bets/pending')
+  async listPendingBets(@Request() req) {
+    const { bankrollId } = req.query;
+    return this.service.listPendingBets(bankrollId);
   }
 }

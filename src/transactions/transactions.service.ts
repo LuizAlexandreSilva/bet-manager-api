@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionType } from '@prisma/client';
+import { TransactionStatus, TransactionType } from '@prisma/client';
+import { endOfDay, startOfDay } from 'date-fns';
+import { zonedTimeToUtc } from 'date-fns-tz';
 import { PrismaService } from 'src/prisma.service';
 import { Transaction } from './transactions.model';
 
 @Injectable()
 export class TransactionsService {
-  private PAGE_SIZE = 20;
-
   constructor(private prisma: PrismaService) {}
 
   async createBet(transaction: Partial<Transaction>) {
@@ -51,15 +51,40 @@ export class TransactionsService {
     });
   }
 
-  async listBets(bankrollId: string, page = 1) {
+  async listBetsByPeriod(startDate: string, endDate: string) {
     return this.prisma.transactions.findMany({
-      skip: (page - 1) * this.PAGE_SIZE,
-      take: this.PAGE_SIZE,
+      where: {
+        type: {
+          in: [TransactionType.STANDARD_BET, TransactionType.MULTIPLE_BET],
+        },
+        status: {
+          notIn: [TransactionStatus.PENDING],
+        },
+        date: {
+          gte: this.getDateAtUTC(startDate, startOfDay),
+          lte: this.getDateAtUTC(endDate, endOfDay),
+        },
+      },
+      include: {
+        Competition: true,
+        Market: true,
+        MultipleSelections: true,
+        Bankroll: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+  }
+
+  async listPendingBets(bankrollId: string) {
+    return this.prisma.transactions.findMany({
       where: {
         bankrollId,
         type: {
           in: [TransactionType.STANDARD_BET, TransactionType.MULTIPLE_BET],
         },
+        status: TransactionStatus.PENDING,
       },
       include: {
         Competition: true,
@@ -70,5 +95,10 @@ export class TransactionsService {
         date: 'desc',
       },
     });
+  }
+
+  private getDateAtUTC(date: string, func: (date: Date) => Date) {
+    const loc = 'UTC';
+    return zonedTimeToUtc(func(new Date(date)), loc);
   }
 }
