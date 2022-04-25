@@ -80,6 +80,7 @@ enum TransactionStatus {
   PENDING
   WON
   LOSS
+  DRAW
 }
 
 model Transactions {
