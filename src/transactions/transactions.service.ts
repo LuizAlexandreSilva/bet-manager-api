@@ -9,6 +9,21 @@ import { Transaction } from './transactions.model';
 export class TransactionsService {
   constructor(private prisma: PrismaService) {}
 
+  private getBetResult(transaction: Partial<Transaction>): number {
+    switch (transaction.status) {
+      case TransactionStatus.PENDING:
+        return null;
+      case TransactionStatus.LOSS:
+        return transaction.stake * -1;
+      case TransactionStatus.WON:
+        return transaction.stake & transaction.odd;
+      case TransactionStatus.DRAW:
+        return transaction.stake;
+      default:
+        return null;
+    }
+  }
+
   async createBet(transaction: Partial<Transaction>) {
     return await this.prisma.transactions.create({
       data: {
@@ -18,20 +33,11 @@ export class TransactionsService {
         note: transaction.note,
         odd: transaction.odd,
         stake: transaction.stake,
+        result: this.getBetResult(transaction),
         status: transaction.status,
-        Sport: {
+        Category: transaction.categoryId && {
           connect: {
-            id: transaction.sportId,
-          },
-        },
-        Bankroll: {
-          connect: {
-            id: transaction.bankrollId,
-          },
-        },
-        Competition: transaction.competitionId && {
-          connect: {
-            id: transaction.competitionId,
+            id: transaction.categoryId,
           },
         },
         Market: transaction.marketId && {
@@ -39,14 +45,6 @@ export class TransactionsService {
             id: transaction.marketId,
           },
         },
-        MultipleSelections:
-          transaction.MultipleSelections?.length > 0
-            ? {
-                createMany: {
-                  data: transaction.MultipleSelections,
-                },
-              }
-            : undefined,
       },
     });
   }
@@ -66,10 +64,8 @@ export class TransactionsService {
         },
       },
       include: {
-        Competition: true,
         Market: true,
-        MultipleSelections: true,
-        Bankroll: true,
+        Category: true,
       },
       orderBy: {
         date: 'desc',
@@ -77,19 +73,17 @@ export class TransactionsService {
     });
   }
 
-  async listPendingBets(bankrollId: string) {
+  async listPendingBets() {
     return this.prisma.transactions.findMany({
       where: {
-        bankrollId,
         type: {
           in: [TransactionType.STANDARD_BET, TransactionType.MULTIPLE_BET],
         },
         status: TransactionStatus.PENDING,
       },
       include: {
-        Competition: true,
         Market: true,
-        MultipleSelections: true,
+        Category: true,
       },
       orderBy: {
         date: 'desc',

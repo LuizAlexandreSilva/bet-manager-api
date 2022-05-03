@@ -42,7 +42,7 @@ async function main() {
     { name: 'Xadrez' },
   ];
 
-  await prisma.sports.createMany({
+  await prisma.categories.createMany({
     data: sports,
     skipDuplicates: true,
   });

@@ -17,8 +17,7 @@ export class TransactionsController {
   }
 
   @Get('bets/pending')
-  async listPendingBets(@Request() req) {
-    const { bankrollId } = req.query;
-    return this.service.listPendingBets(bankrollId);
+  async listPendingBets() {
+    return this.service.listPendingBets();
   }
 }

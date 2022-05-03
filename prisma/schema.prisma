@@ -22,21 +22,8 @@ model Users {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Bankrolls Bankrolls[]
-  Competitions Competitions[]
+  Categories Categories[]
   Markets Markets[]
-}
-
-model Competitions {
-  id String  @id @default(uuid())
-  name String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String?
-  Users Users? @relation(fields: [userId], references: [id])
-
-  Transaction Transactions[]
 }
 
 model Markets {
@@ -49,23 +36,13 @@ model Markets {
   Transaction Transactions[]
 }
 
-model Bankrolls {
-  id String  @id @default(uuid())
-  name String
-  description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deleted Boolean @default(false)
-  userId String
-  Users Users @relation(fields: [userId], references: [id])
-  Transactions Transactions[]
-}
-
-model Sports {
+model Categories {
   id String  @id @default(uuid())
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId String?
+  Users Users? @relation(fields: [userId], references: [id])
   Transactions Transactions[]
 }
 
@@ -91,26 +68,12 @@ model Transactions {
   stake Decimal
   odd Float
   status TransactionStatus
+  result Float?
   note String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  bankrollId String
-  Bankroll Bankrolls @relation(fields: [bankrollId], references: [id])
-  competitionId String?
-  Competition Competitions? @relation(fields: [competitionId], references: [id])
   marketId String?
   Market Markets? @relation(fields: [marketId], references: [id])
-  MultipleSelections MultipleSelections[]
-  sportId String
-  Sport Sports @relation(fields: [sportId], references: [id])
-}
-
-model MultipleSelections {
-  id String  @id @default(uuid())
-  name String
-  odd Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  transactionId String
-  Transaction Transactions @relation(fields: [transactionId], references: [id])
+  categoryId String?
+  Category Categories? @relation(fields: [categoryId], references: [id])
 }
