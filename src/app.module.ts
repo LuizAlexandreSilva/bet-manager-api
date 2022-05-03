@@ -5,11 +5,20 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { UsersModule } from './users/users.module';
+import { CategoriesModule } from './categories/categories.module';
+import { MarketsModule } from './markets/markets.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, ConfigModule.forRoot({ isGlobal: true }), TransactionsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    TransactionsModule,
+    MarketsModule,
+    CategoriesModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
